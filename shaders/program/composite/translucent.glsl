@@ -44,7 +44,7 @@ void main ()
     ivec2 hitTexel = ivec2(hitUv.xy * renderSize);
 
     if (rt.hit) {
-        if (floor(hitUv.xy) == 0.0 && lengthSquared(hitPos - screenToPlayerPos(vec3(hitUv.xy, texelFetch(depthtex1, hitTexel, 0).x)).xyz) < 0.0025) {
+        if (floor(hitUv.xy) == vec2(0.0) && lengthSquared(hitPos - screenToPlayerPos(vec3(hitUv.xy, texelFetch(depthtex1, hitTexel, 0).x)).xyz) < 0.0025) {
             rayColor += max(rt.albedo.rgb, rt.F0) * texelFetch(colortex12, hitTexel, 0).rgb;
             rayColor += getLightTransmittance(shadowDir) * lightBrightness * texelFetch(colortex5, hitTexel, 0).rgb * evalCookBRDF(shadowDir, ray.direction, max(0.1, rt.roughness), rt.normal, rt.albedo.rgb, rt.F0);
         } else {

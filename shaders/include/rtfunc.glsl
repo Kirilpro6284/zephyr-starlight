@@ -52,7 +52,7 @@ for (boxTestCount = 0u, triangleTestCount = 0u; triangleTestCount < 1024u && box
             vec3 uv = vec3(invDet * cross(ao, ray.direction) * mat2x3(tr.bitangent, -tr.tangent), 1.0);
             uv.z = dot(uv, vec3(-1.0, -1.0, 1.0));
 
-            if (tr.isQuad ? floor(uv.xy) == 0.0 : floor(uv.xyz) == 0.0) 
+            if (tr.isQuad ? floor(uv.xy) == vec2(0.0) : floor(uv.xyz) == vec3(0.0)) 
             {   
                 vec4 albedo;
                 vec2 texcoord = mat3x2(tr.uv0, tr.uv1, tr.uv2) * uv;
@@ -60,7 +60,7 @@ for (boxTestCount = 0u, triangleTestCount = 0u; triangleTestCount < 1024u && box
                 if (tr.textureIndex != 4095u)
                 {
                     TextureKey tk = allTextures.keys[tr.textureIndex];
-                    ivec2 texelCoord = ivec2(vec2(1u << uvec2(tk.bounds >> 28u, (tk.bounds >> 24u) & 15u)) * texcoord);
+                    ivec2 texelCoord = ivec2(vec2(uvec2(1u) << uvec2(tk.bounds >> 28u, (tk.bounds >> 24u) & 15u)) * texcoord);
                     albedo = unpackUnorm4x8(allTextures.data[(tk.bounds & 16777215u) + texelCoord.x + texelCoord.y * (1u << (tk.bounds >> 28u))]);
                 } else albedo = textureLod(shadowtex0, texcoord, 0.0);
 

@@ -45,7 +45,7 @@ void main ()
 
     vec4 lastFrame;
 
-    if (floor(prevUv.xy) == 0.0 && prevUv.w > 0.0)
+    if (floor(prevUv.xy) == vec2(0.0) && prevUv.w > 0.0)
     {   
         lastFrame = texBilinearDepthReject(colortex5, colortex0, geoNormal * dot(geoNormal, playerPos.xyz), prevUv.xy, renderSize);
     }
