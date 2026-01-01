@@ -24,7 +24,7 @@
         }
 
         uvec2 logSize = uvec2(ceil(log2(vec2(size) - 0.5)));
-        size = 1u << logSize;
+        size = uvec2(1) << logSize;
 
         for (uint attempt = 0u; attempt < 4u; attempt++) {
             uint index = (hash + attempt * attempt) & 1023u;

@@ -73,7 +73,7 @@ void main ()
 
             vec3 diffuse, direct;
 
-            if (floor(hitUv.xy) == 0.0 && distance(hitPos, screenToPlayerPos(vec3(hitUv.xy, texelFetch(depthtex1, ivec2(hitUv.xy * renderSize), 0).x)).xyz) < 0.05) {
+            if (floor(hitUv.xy) == vec2(0.0) && distance(hitPos, screenToPlayerPos(vec3(hitUv.xy, texelFetch(depthtex1, ivec2(hitUv.xy * renderSize), 0).x)).xyz) < 0.05) {
                 diffuse = texelFetch(colortex3, ivec2(hitUv.xy * renderSize), 0).rgb;
                 direct = texelFetch(colortex5, ivec2(hitUv.xy * renderSize), 0).rgb;
             } else {
