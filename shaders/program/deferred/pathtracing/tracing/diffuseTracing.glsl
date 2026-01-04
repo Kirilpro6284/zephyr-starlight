@@ -92,7 +92,7 @@ void main ()
         } 
         #ifndef DIMENSION_END
             else {
-                radiance += 0.1*vec3(SUN_RED, SUN_GREEN, SUN_BLUE)+SKY_RADIANCE*rt.albedo.rgb * max(0.0, dot(mat.textureNormal, diffuseRay.direction)) * sampleSkyView(diffuseRay.direction);
+                radiance += 0.01*vec3(SUN_RED, SUN_GREEN, SUN_BLUE)+SKY_RADIANCE*rt.albedo.rgb * max(0.0, dot(mat.textureNormal, diffuseRay.direction)) * sampleSkyView(diffuseRay.direction);
             }
         #endif
     }
