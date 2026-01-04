@@ -26,5 +26,5 @@ void main ()
 
     DeferredMaterial mat = unpackMaterialData(texel);
 
-    color.rgb += texelFetch(colortex2, texel, 0).rgb * lightBrightness * evalCookBRDF(shadowDir, normalize(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, depth)).xyz - screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, 0.0)).xyz), max(0.1, mat.roughness), mat.textureNormal, mat.albedo.rgb, mat.F0) * getLightTransmittance(shadowDir);
+    color.rgb += vec3(SUN_RED,SUN_GREEN,SUN_BLUE)*texelFetch(colortex2, texel, 0).rgb * lightBrightness * evalCookBRDF(shadowDir, normalize(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, depth)).xyz - screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, 0.0)).xyz), max(0.1, mat.roughness), mat.textureNormal, mat.albedo.rgb, mat.F0) * getLightTransmittance(shadowDir);
 }
