@@ -36,18 +36,26 @@ value.NOISE_METHOD.1 = Blue Noise
 option.DIFFUSE_SAMPLES               = Diffuse Samples
 option.DIFFUSE_MAX_RT_DISTANCE       = Diffuse Trace Distance
 option.PT_DIFFUSE_ACCUMULATION_LIMIT = Max Accumulated Frames
+value.PT_DIFFUSE_ACCUMULATION_LIMIT.99999 = Render Mode
 option.DIFFUSE_DENOISE_PASSES        = Denoising Passes
 option.SUNLIGHT_GI_QUALITY           = Sunlight GI Quality
+option.DIFFUSE_DENOISE_TOGGLE = Diffuse Temporal Filter Toggle
+option.DIFFUSE_SPATIAL_FILTER = Diffuse Spatial Filtering
 
 option.REFLECTION_SAMPLES               = Reflection Samples
-option.REFLECTION_MAX_RT_DISTANCE       = Reflection Trace Distance
+option.REFLECTION_MAX_RT_DISTANCE       = Reflection Trace Distance 
 option.PT_REFLECTION_ACCUMULATION_LIMIT = Max Accumulated Frames
+value.PT_REFLECTION_ACCUMULATION_LIMIT.99999 = Render Mode
 option.REFLECTION_ROUGHNESS_THRESHOLD   = Reflection Roughness Threshold
-
+option.REFLECTION_DENOISE_TOGGLE = Reflection Temporal Filter Toggle
+option.REFLECTION_SPATIAL_FILTER = Reflection Spatial Filtering 
 option.SHADOW_SAMPLES               = Shadow Samples
 option.SHADOW_MAX_RT_DISTANCE       = Shadow Trace Distance
 option.PT_SHADOW_ACCUMULATION_LIMIT = Max Accumulated Frames
+value.PT_SHADOW_ACCUMULATION_LIMIT.99999 = Render Mode
 option.SUN_SIZE                     = Sun Size
+option.SHADOW_DENOISE_TOGGLE = Shadow Temporal Filter Toggle
+option.SHADOW_SPATIAL_FILTER = Shadow Spatial Filtering 
 
 option.DENOISER_DEPTH_WEIGHT  = Denoiser Depth Weight
 option.DENOISER_NORMAL_WEIGHT = Denoiser Normal Weight
@@ -79,6 +87,10 @@ option.TRIANGLE_ARRAY_SIZE  = Triangle Array Size
 
 option.sunPathRotation      = Sun Path Rotation
 option.SUN_AZIMUTH_ROTATION = Sun Azimuth Rotation
+option.OUTGOING_RADIANCE_INTENSITY = Sunlight Radiance Intensity
+option.SUN_RED = Sunlight Red 
+option.SUN_GREEN = Sunlight Green 
+option.SUN_BLUE = Sunlight Blue
 
 option.SKY_MIE          = Mie Amount
 option.SKY_OZONE        = Ozone Amount
@@ -108,7 +120,8 @@ option.TAA_OFFCENTER_WEIGHT   = TAA Offcenter Weight
 option.TAA_MIP_BIAS           = TAA Mip Bias
 option.SHARPENING             = Sharpening
 
-option.DYNAMIC_EXPOSURE             = Dynamic Exposure
+option.DYNAMIC_EXPOSURE             = Dynamic Exposure 
+option.EXPOSURE_OFFSET = Dynamic Exposure Offset
 option.ADAPTATION_SPEED             = Adaptation Speed
 option.MANUAL_EXPOSURE              = Manual Exposure
 option.SATURATION                   = Saturation
