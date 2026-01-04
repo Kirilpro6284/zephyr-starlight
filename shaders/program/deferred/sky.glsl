@@ -34,6 +34,6 @@ void main ()
     #ifdef DIMENSION_END
         color = vec4(0.0);
     #else
-        color.rgb = pow(texelFetch(colortex10, texel, 0).rgb, vec3(2.2)) + mix(calcSkyColor(normalize(screenToPlayerPos(vec3(uv, 0.9)).xyz - screenToPlayerPos(vec3(uv, 0.1)).xyz), sunDir, blueNoise(gl_FragCoord.xy).x), vec3(SUN_RED,SUN_GREEN,SUN_BLUE)-1.0, 0.5);
+        color.rgb = pow(texelFetch(colortex10, texel, 0).rgb, vec3(2.2)) + calcSkyColor(normalize(screenToPlayerPos(vec3(uv, 0.9)).xyz - screenToPlayerPos(vec3(uv, 0.1)).xyz), sunDir, blueNoise(gl_FragCoord.xy).x)*vec3(SUN_RED,SUN_GREEN,SUN_BLUE);
     #endif
 }
