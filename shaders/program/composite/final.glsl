@@ -34,7 +34,7 @@ void main ()
         }
 
         #ifdef DYNAMIC_EXPOSURE
-            float exposure = 8.0 * exp(0.005 / renderState.globalLuminance);
+            float exposure = EXPOSURE_OFFSET * exp(0.005 / renderState.globalLuminance);
         #else
             float exposure = MANUAL_EXPOSURE;
         #endif
