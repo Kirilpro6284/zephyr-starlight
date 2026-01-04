@@ -56,6 +56,7 @@ value.PT_SHADOW_ACCUMULATION_LIMIT.99999 = Render Mode
 option.SUN_SIZE                     = Sun Size
 option.SHADOW_DENOISE_TOGGLE = Shadow Temporal Filter Toggle
 option.SHADOW_SPATIAL_FILTER = Shadow Spatial Filtering 
+option.SPATIAL_SHADOW_SAMPLE_WEIGHT = Spatial Shadow Sample Weight
 
 option.DENOISER_DEPTH_WEIGHT  = Denoiser Depth Weight
 option.DENOISER_NORMAL_WEIGHT = Denoiser Normal Weight
@@ -88,6 +89,7 @@ option.TRIANGLE_ARRAY_SIZE  = Triangle Array Size
 option.sunPathRotation      = Sun Path Rotation
 option.SUN_AZIMUTH_ROTATION = Sun Azimuth Rotation
 option.OUTGOING_RADIANCE_INTENSITY = Sunlight Radiance Intensity
+option.SKY_RADIANCE = Skylight Radiance Intensity
 option.SUN_RED = Sunlight Red 
 option.SUN_GREEN = Sunlight Green 
 option.SUN_BLUE = Sunlight Blue
