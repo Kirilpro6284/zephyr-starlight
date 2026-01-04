@@ -12,6 +12,10 @@
 
 #include "/include/text.glsl"
 
+#define SKY_RED 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define SKY_GREEN 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define SKY_BLUE 1.0 // [0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+
 /* RENDERTARGETS: 7 */
 layout (location = 0) out vec4 color;
 
@@ -30,6 +34,6 @@ void main ()
     #ifdef DIMENSION_END
         color = vec4(0.0);
     #else
-        color.rgb = pow(texelFetch(colortex10, texel, 0).rgb, vec3(2.2)) + calcSkyColor(normalize(screenToPlayerPos(vec3(uv, 0.9)).xyz - screenToPlayerPos(vec3(uv, 0.1)).xyz), sunDir, blueNoise(gl_FragCoord.xy).x);
+        color.rgb = pow(texelFetch(colortex10, texel, 0).rgb, vec3(2.2)) + mix(calcSkyColor(normalize(screenToPlayerPos(vec3(uv, 0.9)).xyz - screenToPlayerPos(vec3(uv, 0.1)).xyz), sunDir, blueNoise(gl_FragCoord.xy).x), vec3(SUN_RED,SUN_GREEN,SUN_BLUE)*0.15, 0.5);
     #endif
 }
