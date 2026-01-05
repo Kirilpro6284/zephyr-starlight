@@ -14,6 +14,11 @@
 
 layout (location = 0) out vec4 color;
 
+vec3 ACESFilm(vec3 x)
+{
+return clamp((x*(CONTRAST*x+SHADOW_OFFSET))/(x*(HIGHLIGHT_SCALE*x+MIDTONE_SLOPE)+TOE_OFFSET),0.0,1.0);
+}
+
 void main ()
 {   
     #ifdef RT_TRACING_EYE
@@ -34,12 +39,12 @@ void main ()
         }
 
         #ifdef DYNAMIC_EXPOSURE
-            float exposure = EXPOSURE_OFFSET * exp(0.005 / renderState.globalLuminance);
+            float exposure = EXPOSURE_OFFSET + 8.0 *exp(0.008 / renderState.globalLuminance);
         #else
             float exposure = MANUAL_EXPOSURE;
         #endif
 
-        color.rgb = mix(pow(1.0 - exp(-exposure * color.rgb), vec3(1.0 / 2.2)), pow(1.0 - exp(-exposure * sharpen.rgb / sharpen.w), vec3(1.0 / 2.2)), -SHARPENING) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
+        color.rgb = mix(pow(ACESFilm(1.0 - exp(-exposure * color.rgb)).rgb, vec3(1.0 / 2.2)), pow(1.0 - exp(-exposure * sharpen.rgb / sharpen.w), vec3(1.0 / 2.2)), -SHARPENING) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
         color.a = 1.0;
     #endif
 /*
