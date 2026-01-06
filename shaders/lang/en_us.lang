@@ -151,6 +151,9 @@ option.AGX_SLOPE_BLUE = AGX SLOPE BLUE
 option.AGX_POWER_RED = AGX POWER RED
 option.AGX_POWER_GREEN = AGX SLOPE GREEN
 option.AGX_POWER_BLUE = AGX SLOPE BLUE
+option.VIGNETTE = Vignette
+value.VIGNETTE.0.0 = Off
+value.VIGNETTE.1.0 = On
 
 
 option.HAND_FOV               = Hand FOV
