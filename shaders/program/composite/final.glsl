@@ -11,13 +11,9 @@
 #include "/include/text.glsl"
 #include "/include/atmosphere.glsl"
 #include "/include/spaceConversion.glsl"
+#include "/include/tonemapping.glsl"
 
 layout (location = 0) out vec4 color;
-
-vec3 ACESFilm(vec3 x)
-{
-return clamp((x*(CONTRAST*x+SHADOW_OFFSET))/(x*(HIGHLIGHT_SCALE*x+MIDTONE_SLOPE)+TOE_OFFSET),0.0,1.0);
-}
 
 void main ()
 {   
@@ -26,28 +22,34 @@ void main ()
         color.a = 1.0;
     #else
         color = texelFetch(colortex10, ivec2(gl_FragCoord.xy), 0);
+
+#if TONEMAPPER=2.0
+color.rgb=color.rgb;
+#else
         color.rgb = mix(vec3(luminance(color.rgb)), color.rgb, SATURATION);
+#endif
+
 
         vec4 sharpen = vec4(0.0);
 
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 float sampleWeight = exp(-length(vec2(x, y)));
-
+#if TONEMAPPER=2.0
                 sharpen += vec4(sampleWeight * texelFetch(colortex10, ivec2(gl_FragCoord.xy) + ivec2(x, y), 0).rgb, sampleWeight);
+#endif
             }
         }
 
-        #ifdef DYNAMIC_EXPOSURE
-            float exposure = EXPOSURE_OFFSET + 8.0*exp(0.006 / renderState.globalLuminance);
-        #else
-            float exposure = MANUAL_EXPOSURE;
-        #endif
-#if ACES==1.0
-        color.rgb = mix(pow(ACESFilm(1.0 - exp(-exposure * color.rgb)).rgb, vec3(1.0 / 2.2)), pow(1.0 - exp(-exposure * sharpen.rgb / sharpen.w), vec3(1.0 / 2.2)), -SHARPENING) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
+#if TONEMAPPER==0.0
+        color.rgb = mix(pow(1.0 - exp(-exposure * color.rgb), vec3(1.0 / 2.2)), pow(1.0 - exp(-exposure * sharpen.rgb / sharpen.w), vec3(1.0 / 2.2)), -SHARPENING) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
+#elif TONEMAPPER==1.0
+     color.rgb = pow(ACESFilm(1.0 - exp(-exposure * color.rgb)).rgb, vec3(1.0 / 2.2)) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
+#elif TONEMAPPER==2.0
+color.rgb = ApplyAgX(color.rgb) + blueNoise(gl_FragCoord.xy)* rcp(255.0) - rcp(510.0);
 #else
-     color.rgb = mix(pow(1.0 - exp(-exposure * color.rgb), vec3(1.0 / 2.2)), pow(1.0 - exp(-exposure * sharpen.rgb / sharpen.w), vec3(1.0 / 2.2)), -SHARPENING) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
-    #endif
+color.rgb = pow(Reinhard(color.rgb*exposure), vec3(1.0/2.2)) + blueNoise(gl_FragCoord.xy)* rcp(255.0) - rcp(510.0);
+#endif
 color.a = 1.0;
 /*
     #define FONT_SIZE 2 // [1 2 3 4 5 6 7 8]
