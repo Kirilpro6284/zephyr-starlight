@@ -4,7 +4,12 @@
         #else
             float exposure = MANUAL_EXPOSURE;
         #endif
+
+      #ifdef DYNAMIC_EXPOSURE
             float AGX_exposure = EXPOSURE_OFFSET + 8.0*(0.18 / renderState.globalLuminance);
+#else
+            float exposure = MANUAL_EXPOSURE;
+        #endif
 
 
 // ACES CURVE
