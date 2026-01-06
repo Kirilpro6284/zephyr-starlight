@@ -23,6 +23,20 @@ void main ()
     {
         integratedData += texelFetch(colortex10, ivec2(samplePos), 0).rgb;
     }
+
+// Vignette - Credits to Ippokratis -> https://www.shadertoy.com/view/lsKSWR
+
+vec2 XY = gl_FragCoord.xy/screenSize.xy;
+
+XY *= 1-XY.yx;
+
+#if VIGNETTE==1.0
+float vig = XY.x*XY.y * 15.0;
+#elif VIGNETTE==0.0
+float vig = 1.0;
+#endif
+
+vec4 vignette = min(min(vec4(vig),texelFetch(colortex10, ivec2(samplePos),0)),vec4(integratedData * rcp(CHROMATIC_ABERRATION_SAMPLES), 1.0));
     
-    color = vec4(integratedData * rcp(CHROMATIC_ABERRATION_SAMPLES), 1.0);
+    color = vignette;
 }
