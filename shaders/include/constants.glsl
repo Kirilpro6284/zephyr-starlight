@@ -31,7 +31,7 @@
         const int colortex7Format = R11F_G11F_B10F; // scene
         const int colortex8Format = RG32UI; // material data 0
         const int colortex9Format = RG32UI; // material data 1
-        const int colortex10Format = RGBA32F; // sun/moon geometry (gbuffers -> deferred), post-processing data (composite)
+        const int colortex10Format = R11F_G11F_B10F; // sun/moon geometry (gbuffers -> deferred), post-processing data (composite)
         const int colortex11Format = RGBA16F;
         const int colortex12Format = RGBA16F;
 
