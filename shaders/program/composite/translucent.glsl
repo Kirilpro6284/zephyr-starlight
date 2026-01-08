@@ -65,7 +65,7 @@ void main ()
             rayColor += getLightTransmittance(shadowDir) * lightBrightness * q.directIrradiance * evalCookBRDF(shadowDir, ray.direction, max(0.1, rt.roughness), rt.normal, rt.albedo.rgb, rt.F0);
         }
     } else {
-        rayColor += rt.albedo.rgb * sampleSkyView(ray.direction);
+        rayColor += rt.albedo.rgb *sampleSkyView(ray.direction);
     }
 
     vec3 transmittance;
@@ -73,13 +73,13 @@ void main ()
     if (mat.blockId == 100) transmittance = exp(-vec3(WATER_ABSORPTION_R, WATER_ABSORPTION_G, WATER_ABSORPTION_B) * distance(rayPos.xyz, screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, depth1)).xyz));
     else transmittance = mat.albedo.rgb;
 
-vec3 TranslucentAlbedo = 1.5*pow(0.425+mat.albedo.rgb, vec3(4.0));
+vec3 TranslucentAlbedo =  0.5+1.5*pow(0.425+mat.albedo.rgb, vec3(4.0));
 
-vec4 TranslucentAlbedoPost = max(dot(mat.normal,sunDir), 0.01)*vec4(mix((vec3(luminance(TranslucentAlbedo))).rgb,TranslucentAlbedo,0.05),1.0);
+vec4 TranslucentAlbedoPost = vec4(mix((vec3(luminance(TranslucentAlbedo))).rgb,TranslucentAlbedo,0.05),1.0);
 
-vec4 WaterLighting = mix(vec4(mix(color.rgb*transmittance, rayColor, schlickFresnel(vec3(mat.blockId == 100 ? WATER_REFLECTANCE : GLASS_REFLECTANCE), -dot(rayDir, mat.normal))), 1.0), TranslucentAlbedoPost, 0.01);
+vec4 WaterLighting = TranslucentAlbedoPost*vec4(mix(color.rgb*transmittance, rayColor, schlickFresnel(vec3(mat.blockId == 100 ? WATER_REFLECTANCE : GLASS_REFLECTANCE), -dot(rayDir, mat.normal))), 1.0);
 
-vec4 GlassLighting = mix(vec4(mix(color.rgb*transmittance, rayColor, schlickFresnel(vec3(mat.blockId == 100 ? WATER_REFLECTANCE : GLASS_REFLECTANCE), -dot(rayDir, mat.normal))), 1.0), TranslucentAlbedoPost, 0.0005);
+vec4 GlassLighting = TranslucentAlbedoPost*vec4(mix(color.rgb*transmittance, rayColor, schlickFresnel(vec3(mat.blockId == 100 ? WATER_REFLECTANCE : GLASS_REFLECTANCE), -dot(rayDir, mat.normal))), 1.0);
 
 color = mat.blockId == 100?WaterLighting:GlassLighting;
 
