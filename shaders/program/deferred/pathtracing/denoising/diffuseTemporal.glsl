@@ -57,7 +57,19 @@ void main ()
     filteredData.rgb = mix(lastFrame.rgb, filteredData.rgb, rcp(lastFrame.w));
 
 #if DIFFUSE_DENOISE_TOGGLE==1
-    filteredData.w = min(lastFrame.w + 1.0, max(PT_DIFFUSE_ACCUMULATION_LIMIT, frameRate));
+
+#if PT_DIFFUSE_ACCUMULATION_LIMIT==99999999
+
+if (length(cameraVelocity)<0.001) {
+    filteredData.w = lastFrame.w + 1.0;
+}
+else {
+filteredData.w=0.0;
+}
+#else
+  filteredData.w = min(lastFrame.w + 1.0, max(PT_DIFFUSE_ACCUMULATION_LIMIT, frameRate));
+#endif
+
 #else
  filteredData.w = 0.0;
 #endif
