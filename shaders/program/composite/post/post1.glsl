@@ -11,42 +11,12 @@
 layout (location = 0) out vec4 color;
 
 void main ()
-{   
+{ 
 
-vec4 sharpen = vec4(0.0);
+vec2 uv = gl_FragCoord.xy / screenSize;
 
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                float sampleWeight = exp(-length(vec2(x, y)));       
-   sharpen += vec4(sampleWeight * texelFetch(colortex10, ivec2(gl_FragCoord.xy) + ivec2(x, y), 0).rgb, sampleWeight);
-            }
-        }
-
-    vec2 start = gl_FragCoord.xy;
-    vec2 end = mix(screenSize / 2.0, gl_FragCoord.xy, 500.0 / (500.0 + CHROMATIC_ABERRATION));
-
-    vec3 integratedData = vec3(0.0);
-    vec2 sampleDir = (end - start) * rcp(CHROMATIC_ABERRATION_SAMPLES);
-    vec2 samplePos = start + sampleDir * blueNoise(gl_FragCoord.xy).r;
-
-    for (int i = 0; i < CHROMATIC_ABERRATION_SAMPLES; i++, samplePos += sampleDir)
-    {
-        integratedData += texelFetch(colortex10, ivec2(samplePos), 0).rgb;
-    }
-
-// Vignette - Credits to Ippokratis -> https://www.shadertoy.com/view/lsKSWR
-
-vec2 XY = gl_FragCoord.xy/screenSize.xy;
-
-XY *= 1-XY.yx;
-
-#if VIGNETTE==1.0
-float vig = XY.x*XY.y * 15.0;
-#elif VIGNETTE==0.0
-float vig = 1.0;
-#endif
-
-vec4 vignette = min(min(vec4(vig),texelFetch(colortex10, ivec2(samplePos),0)),mix(vec4(integratedData * rcp(CHROMATIC_ABERRATION_SAMPLES), 1.0),sharpen, -SHARPENING/10.0));
-    
-    color = vignette;
+    color.r = texture(colortex10, mix(vec2(0.5), uv, 500.0 / (500.0 + 2 * CHROMATIC_ABERRATION))).r;
+    color.g = texture(colortex10, mix(vec2(0.5), uv, 500.0 / (500.0 + CHROMATIC_ABERRATION))).g;
+    color.b = texture(colortex10, uv).b;
+    color.a = 1.0;
 }
