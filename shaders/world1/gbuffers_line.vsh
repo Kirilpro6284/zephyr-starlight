@@ -1,4 +1,4 @@
-#version 430 compatibility
+#version 430 core
 
 #define vsh
 

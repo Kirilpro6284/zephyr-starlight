@@ -7,6 +7,7 @@
 #include "/include/main.glsl"
 #include "/include/heitz.glsl"
 #include "/include/octree.glsl"
+#include "/include/wave.glsl"
 #include "/include/raytracing.glsl"
 #include "/include/textureData.glsl"
 #include "/include/brdf.glsl"
@@ -16,18 +17,32 @@
 layout (rgba16f) uniform image2D colorimg2;
 layout (local_size_x = 8, local_size_y = 4) in;
 
-#if TAA_UPSCALING_FACTOR == 100
-    const vec2 workGroupsRender = vec2(1.0, 1.0);
-#elif TAA_UPSCALING_FACTOR == 75
-    const vec2 workGroupsRender = vec2(0.75, 0.75);
-#elif TAA_UPSCALING_FACTOR == 50
-    const vec2 workGroupsRender = vec2(0.5, 0.5);
+#ifdef SHADOW_HALF_RES
+    #if TAA_UPSCALING_FACTOR == 100
+        const vec2 workGroupsRender = vec2(0.5, 0.5);
+    #elif TAA_UPSCALING_FACTOR == 75
+        const vec2 workGroupsRender = vec2(0.375, 0.375);
+    #elif TAA_UPSCALING_FACTOR == 50
+        const vec2 workGroupsRender = vec2(0.25, 0.25);
+    #endif
+#else
+    #if TAA_UPSCALING_FACTOR == 100
+        const vec2 workGroupsRender = vec2(1.0, 1.0);
+    #elif TAA_UPSCALING_FACTOR == 75
+        const vec2 workGroupsRender = vec2(0.75, 0.75);
+    #elif TAA_UPSCALING_FACTOR == 50
+        const vec2 workGroupsRender = vec2(0.5, 0.5);
+    #endif
 #endif
 
 void main ()
 {
     uint state = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * uint(renderSize.x) + uint(renderSize.x) * uint(renderSize.y) * (frameCounter & 1023u);
-    ivec2 texel = ivec2(gl_GlobalInvocationID.xy);
+    #ifdef SHADOW_HALF_RES
+        ivec2 texel = 2 * ivec2(gl_GlobalInvocationID.xy) + checker2x2(frameCounter);
+    #else
+        ivec2 texel = ivec2(gl_GlobalInvocationID.xy);
+    #endif
 
     float depth = texelFetch(depthtex1, texel, 0).x;
 

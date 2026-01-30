@@ -14,13 +14,19 @@
     const float centerDepthHalflife = 2.0;
 
     const float lineWidth = 1.0;
-    const float handScale = cos(radians(HAND_FOV) / 2.0) / sin(radians(HAND_FOV) / 2.0);
+
+    #if HAND_FOV > 0
+        const float handScale = cos(radians(HAND_FOV) / 2.0) / sin(radians(HAND_FOV) / 2.0);
+    #endif
 
     const ivec3 voxelVolumeSize = ivec3(2.0 * shadowDistance, min(256.0, 2.0 * shadowDistance - 64.0 * float(shadowDistance > 100.0)), 2.0 * shadowDistance);
     const ivec3 halfVoxelVolumeSize = voxelVolumeSize >> 1;
 
     #define END_MARKER 0x00ffffffu
     #define IRCACHE_INV_MARKER uvec2(3154164736u)
+
+    // Color multiplier to avoid precision issues with dark colors
+    #define EXPONENT_BIAS 64.0
 
     /*  
         const int colortex0Format =  RGB16F;         // previous frame normal + depth
@@ -32,10 +38,8 @@
         const int colortex6Format =  RGBA16F;        // TAA history
         const int colortex7Format =  R11F_G11F_B10F; // scene
         const int colortex8Format =  RG32UI;         // material data 0
-        const int colortex9Format =  R32UI;          // material data 1
         const int colortex10Format = RGBA16F;        // sun/moon geometry (gbuffers -> deferred), post-processing data (composite)
-        const int colortex11Format = RGBA16F;
-        const int colortex12Format = R11F_G11F_B10F; // filtered diffuse lighting
+        const int colortex12Format = R11F_G11F_B10F; // filtered diffuse lighting (deferred), bloom tiles (composite)
         const int colortex13Format = R32F;           // reflection virtual depth buffer for TAA
 
         const int shadowcolor0Format = R8;
@@ -63,5 +67,17 @@
         const bool colortex12Clear = false;
         const bool colortex13Clear = true;
     */
+
+    // https://discordapp.com/channels/237199950235041794/736928196162879510/1459984859312423152 <3
+
+    #ifdef NORMAL_MAPPING
+    /*
+        const int colortex9Format = R32UI;   
+    */   
+    #else
+    /*
+        const int colortex9Format = R16UI; 
+    */
+    #endif
 
 #endif

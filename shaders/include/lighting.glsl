@@ -1,7 +1,7 @@
 #ifndef INCLUDE_LIGHTING
     #define INCLUDE_LIGHTING
 
-    IRCResult sampleReflectionLighting (vec3 playerPos, vec3 normal, vec2 rand, float gradient)
+    IrradianceSum sampleReflectionLighting (vec3 playerPos, vec3 normal, vec2 rand, float gradient)
     {
         vec3 sampleUv = playerToScreenPos(playerPos);
         ivec2 sampleTexel = ivec2(sampleUv.xy * renderSize);
@@ -10,10 +10,14 @@
                      * (1.0 - smoothstep(gradient, 0.5, abs(sampleUv.x - 0.5))) 
                      * (1.0 - smoothstep(gradient, 0.5, abs(sampleUv.y - 0.5)));
 
-        IRCResult screen = IRCResult(vec3(0.0), vec3(0.0));
-        IRCResult cache  = IRCResult(vec3(0.0), vec3(0.0));
+        IrradianceSum screen = IrradianceSum(vec3(0.0), vec3(0.0));
+        IrradianceSum cache  = IrradianceSum(vec3(0.0), vec3(0.0));
 
-        if (weight > 0.001) screen = IRCResult(texelFetch(colortex12, sampleTexel, 0).rgb, texelFetch(colortex5, sampleTexel, 0).rgb);
+        #ifdef DIFFUSE_HALF_RES
+            if (weight > 0.001) screen = IrradianceSum(texelFetch(colortex12, sampleTexel >> 1, 0).rgb, texelFetch(colortex5, sampleTexel, 0).rgb);
+        #else
+            if (weight > 0.001) screen = IrradianceSum(texelFetch(colortex12, sampleTexel, 0).rgb, texelFetch(colortex5, sampleTexel, 0).rgb);
+        #endif
 
         if (weight < 0.999) {
             #ifdef SMOOTH_IRCACHE
@@ -27,7 +31,7 @@
             #endif
         }
 
-        return IRCResult(mix(cache.diffuseIrradiance, screen.diffuseIrradiance, weight), mix(cache.directIrradiance, screen.directIrradiance, weight));
+        return IrradianceSum(mix(cache.diffuseIrradiance / SECONDARY_GI_BRIGHTNESS, screen.diffuseIrradiance, weight), mix(cache.directIrradiance, screen.directIrradiance, weight));
     }
 
 #endif

@@ -1,3 +1,5 @@
 #version 430 compatibility
 
-#include "/program/deferred/pathtracing/applySpecular.glsl"
+#define FILTER_PASS 5
+
+#include "/program/deferred/pathtracing/denoising/reflectionSpatial.glsl"

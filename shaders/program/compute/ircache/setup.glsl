@@ -23,5 +23,5 @@ layout (local_size_x = 64) in;
 
 void main ()
 {   
-    ircache.entries[gl_GlobalInvocationID.x] = IRCVoxel(0u, 0u, 0u, 0u, 0u, 0u, IRCACHE_INV_MARKER);
+    ircache.entries[gl_GlobalInvocationID.x] = IrcacheVoxel(0u, 0u, 128u, 0u, 0u, 0u, IRCACHE_INV_MARKER);
 }

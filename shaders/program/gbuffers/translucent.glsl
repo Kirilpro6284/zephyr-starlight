@@ -21,7 +21,7 @@ void main ()
     
     vec4 albedo = texture(gtexture, vsout.texcoord) * vec4(vsout.vertexColor, 1.0);
 
-    colortex1Out = uvec4(packUnorm4x8(albedo), vsout.blockId, 0u, 1u);
+    colortex1Out = uvec4(packUnorm4x8(albedo.a > 0.1 ? albedo : vec4(0.5, 0.5, 0.5, 0.1)), vsout.blockId, 0u, 1u);
 }
 
 #endif
@@ -41,10 +41,10 @@ void main ()
 {   
     gl_Position = ftransform();
     
-    #ifdef STAGE_HAND   
+    #if defined STAGE_HAND && HAND_FOV > 0   
         gl_Position.xy *= handScale / gl_ProjectionMatrix[1].y;
     #endif
-
+    
     gl_Position.xy = mix(-gl_Position.ww, gl_Position.xy, TAAU_RENDER_SCALE);
     gl_Position.xy += gl_Position.w * taaOffset;
 

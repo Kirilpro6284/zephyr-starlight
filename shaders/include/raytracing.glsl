@@ -3,12 +3,12 @@
 
     #include "/include/octree.glsl"
 
-    RayHitInfo TraceRay (in Ray ray, float maxDist, bool useBackFaceCulling, bool alphaBlend)
+    RayHitInfo TraceGenericRay (in Ray ray, float maxDist, bool useBackFaceCulling, bool alphaBlend)
     {   
         #include "/include/rtfunc.glsl"
     }
 
-    vec4 TraceShadowRay (in Ray ray, float maxDist, bool useBackFaceCulling)
+    vec3 TraceShadowRay (in Ray ray, float maxDist, bool useBackFaceCulling)
     {   
         #define RT_SHADOW
         #include "/include/rtfunc.glsl"

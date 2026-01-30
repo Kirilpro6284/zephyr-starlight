@@ -6,6 +6,8 @@
 #include "/include/main.glsl"
 #include "/include/textureData.glsl"
 
+uniform float alphaTestRef = 0.1;
+
 #ifdef fsh
 
 in VSOUT
@@ -30,19 +32,14 @@ void main ()
     if (any(greaterThan(gl_FragCoord.xy, screenSize))) discard;
 
     vec2 atlasTexCoord = vec2(textureSize(gtexture, 0)) * vsout.texcoord;
-
-    float mipLevel = vsout.blockId == 6 ? 0.0 : max(0.0, TAA_MIP_BIAS * 0.5 * log2(max(lengthSquared(dFdx(atlasTexCoord)), lengthSquared(dFdy(atlasTexCoord)))));
+    float mipLevel = max(0.0, TAA_MIP_SCALE * 0.5 * log2(max(lengthSquared(dFdx(atlasTexCoord)), lengthSquared(dFdy(atlasTexCoord)))));
 
     vec4 albedo = textureLod(gtexture, vsout.texcoord, mipLevel) * vec4(vsout.vertexColor, 1.0);
 
     #ifdef SPECULAR_MAPPING
         vec4 specularData = textureLod(specular, vsout.texcoord, 0.0);
     #else
-        vec4 specularData = vec4(0.0, 0.0, 0.0, 1.0);
-    #endif
-
-    #ifdef NORMAL_MAPPING
-        vec4 normalData = textureLod(normals, vsout.texcoord, mipLevel);
+        vec4 specularData = vec4(0.0);
     #endif
 
     vec3 geoNormal = octDecode(unpack2x16(vsout.vertexNormal));
@@ -50,8 +47,8 @@ void main ()
     if (!gl_FrontFacing) geoNormal *= -1.0;
 
     #ifdef NORMAL_MAPPING
-        vec3 textureNormal = vec3(normalData.rg * 2.0 - 1.0, 1.0);
-        textureNormal.xy *= vec2(greaterThan(abs(textureNormal.xy), vec2(rcp(128.0))));
+        vec3 textureNormal = vec3(textureLod(normals, vsout.texcoord, mipLevel).rg * 2.0 - 1.0, 1.0);
+        textureNormal.xy *= step(vec2(rcp(128.0)), abs(textureNormal.xy));
         textureNormal.z = sqrt(max(0.0, 1.0 - lengthSquared(textureNormal.xy)));
         textureNormal = tbnNormalTangent(geoNormal, vsout.vertexTangent) * textureNormal;
     #else
@@ -59,7 +56,7 @@ void main ()
     #endif
 
     #ifdef IPBR
-        applyIntegratedSpecular(albedo.rgb, specularData, ivec2(atlasSize * vsout.texcoord) & 15, vsout.blockId);
+        applyIntegratedSpecular(albedo.rgb, specularData, vsout.blockId);
     #endif
 
     uvec4 packedData = packMaterialData(albedo.rgb, geoNormal, textureNormal, specularData, vsout.blockId, 
@@ -73,7 +70,7 @@ void main ()
     colortex8Out = packedData;
     colortex9Out = packedData.zwxy;
 
-    if (albedo.a < 0.1) discard;
+    if (albedo.a < alphaTestRef) discard;
 }
 
 #endif
@@ -100,7 +97,7 @@ void main ()
 {   
     gl_Position = ftransform();
 
-    #ifdef STAGE_HAND   
+    #if defined STAGE_HAND && HAND_FOV > 0   
         gl_Position.xy *= handScale / gl_ProjectionMatrix[1].y;
     #endif
 
@@ -117,8 +114,12 @@ void main ()
 
     #ifdef STAGE_TERRAIN
         vsout.blockId = uint(mc_Entity.x);
-    #else
+    #elif defined STAGE_HAND
         vsout.blockId = uint(currentRenderedItemId);
+    #elif defined STAGE_ENTITIES
+        vsout.blockId = uint(currentRenderedItemId == 0 ? entityId : currentRenderedItemId);
+    #elif defined STAGE_BLOCK_ENTITIES
+        vsout.blockId = uint(blockEntityId);
     #endif
 }
 

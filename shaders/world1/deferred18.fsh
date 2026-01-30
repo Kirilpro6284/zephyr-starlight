@@ -1,3 +1,5 @@
 #version 430 compatibility
 
-#include "/program/deferred/pathtracing/applyShadow.glsl"
+#define FILTER_PASS 2
+
+#include "/program/deferred/pathtracing/denoising/shadowSpatial.glsl"

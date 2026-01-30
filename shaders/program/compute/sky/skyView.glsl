@@ -6,10 +6,8 @@
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
 #include "/include/octree.glsl"
-#include "/include/raytracing.glsl"
 #include "/include/textureData.glsl"
 #include "/include/brdf.glsl"
-#include "/include/ircache.glsl"
 #include "/include/atmosphere.glsl"
 
 layout (local_size_x = 8, local_size_y = 8) in;

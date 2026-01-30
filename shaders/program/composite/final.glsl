@@ -5,19 +5,22 @@
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
+#include "/include/wave.glsl"
 #include "/include/raytracing.glsl"
 #include "/include/textureData.glsl"
 #include "/include/brdf.glsl"
 #include "/include/text.glsl"
+#include "/include/ircache.glsl"
 #include "/include/atmosphere.glsl"
 #include "/include/spaceConversion.glsl"
-
+#include "/include/textureSampling.glsl"
+ 
 layout (location = 0) out vec4 color;
 
 void main ()
 {   
-    #ifdef RT_TRACING_EYE
-        color.rgb = pow(TraceRay(Ray(vec3(0.0), normalize(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, 1.0)).xyz)), 1024.0, true, true).albedo.rgb, vec3(1.0 / 2.2));
+    #ifdef DEBUG_VOXELIZATION
+        color.rgb = pow(TraceGenericRay(Ray(vec3(0.0), normalize(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, 1.0)).xyz)), 1024.0, true, true).albedo.rgb, vec3(1.0 / 2.2));
         color.a = 1.0;
     #else
         color = texelFetch(colortex10, ivec2(gl_FragCoord.xy), 0);
@@ -42,4 +45,6 @@ void main ()
         color.rgb = mix(pow(1.0 - exp(-exposure * color.rgb), vec3(1.0 / 2.2)), pow(1.0 - exp(-exposure * sharpen.rgb / sharpen.w), vec3(1.0 / 2.2)), -SHARPENING) + blueNoise(gl_FragCoord.xy) * rcp(255.0) - rcp(510.0);
         color.a = 1.0;
     #endif
+
+    //color.rg = getWaterWaveNormalTex(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, texelFetch(depthtex1, ivec2(gl_FragCoord.xy), 0).r)).xyz + cameraPosition).rg;
 }

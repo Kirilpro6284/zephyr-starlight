@@ -1,5 +1,6 @@
 #include "/include/uniforms.glsl"
 #include "/include/config.glsl"
+#include "/include/checker.glsl"
 #include "/include/constants.glsl"
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"

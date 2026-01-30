@@ -11,7 +11,8 @@
 
     void main ()
     {
-        allTextures.data[offset + uint(gl_FragCoord.x) + uint(gl_FragCoord.y) * (1u << uint(ceil(log2(float(textureSize(gtexture, 0).x) - 0.5))))] = packUnorm4x8(texelFetch(gtexture, ivec2(gl_FragCoord.xy), 0));
+        vec4 data = texelFetch(gtexture, ivec2(gl_FragCoord.xy), 0);
+        allTextures.data[offset + uint(gl_FragCoord.x) + uint(gl_FragCoord.y) * (1u << uint(ceil(log2(float(textureSize(gtexture, 0).x) - 0.5))))] = packUnorm4x8(vec4(data.rgb, step(0.1, data.a)));
         discard;
     }
 
@@ -45,7 +46,11 @@
     void main ()
     {   
         #ifndef VOXELIZE_PLAYER
-            if (entityId == 2) return;
+            if (entityId == 1002) return;
+        #endif
+
+        #ifndef GLOWING_ARMOR_TRIMS
+            if (currentRenderedItemId == 87) return;
         #endif
 
         vec3 tangent = vsout[2].vertexPosition - vsout[1].vertexPosition;
@@ -53,10 +58,10 @@
 
         vec3 normal = cross(tangent, bitangent);
 
-        bool doBackFaceCull = vsout[0].id.x == 1 || vsout[0].id.x == 100;
+        bool doBackFaceCull = vsout[0].id.x > 10000 && vsout[0].id.x < 65000;
         if (all(lessThan(abs(normal), vec3(0.00005))) || (doBackFaceCull && dot(normal, vec3(1.0, 0.5, 0.8)) < 0.0)) return;
 
-        doBackFaceCull = doBackFaceCull || (renderStage == MC_RENDER_STAGE_TERRAIN_TRANSLUCENT) || (entityId == 2);
+        doBackFaceCull = doBackFaceCull || (renderStage == MC_RENDER_STAGE_TERRAIN_TRANSLUCENT) || (entityId == 1002);
 
         normal = alignNormal(normal, 0.00005);
 
@@ -69,12 +74,16 @@
         ivec3 voxelMin = halfVoxelVolumeSize + ivec3(floor(minBounds));
         ivec3 voxelMax = halfVoxelVolumeSize + ivec3(ceil(maxBounds));
 
-        if (entityId != 1 && all(greaterThanEqual(voxelMin, ivec3(0))) && all(lessThan(voxelMax, voxelVolumeSize + 1))) 
+        if (entityId != 1001 && all(greaterThanEqual(voxelMin, ivec3(0))) && all(lessThan(voxelMax, voxelVolumeSize + 1))) 
         {   
             #ifdef FORCE_TRIANGLE_TRACING
                 bool isQuad = false;
             #else
-                bool isQuad = vsout[0].id.y == 0;
+                #ifdef STAGE_TERRAIN
+                    bool isQuad = vsout[0].id.y == 0;
+                #else
+                    bool isQuad = true;
+                #endif
             #endif
 
             BVHTriangle tri = BVHTriangle 
@@ -177,9 +186,14 @@
         vsout.texcoord = mat4x2(gl_TextureMatrix[0]) * gl_MultiTexCoord0;
         vsout.vertexColor = gl_Color.rgb;
         vsout.vertexPosition = floor(playerPos + 0.5) + (playerPos - floor(playerPos + 0.5)) * step(vec3(0.001), abs(playerPos - floor(playerPos + 0.5)));
-
-        if (renderStage == MC_RENDER_STAGE_TERRAIN_SOLID || renderStage == MC_RENDER_STAGE_TERRAIN_TRANSLUCENT) vsout.id = max(ivec2(0), ivec2(mc_Entity));
-        else vsout.id = ivec2(currentRenderedItemId, 0);
+        
+        #ifdef STAGE_TERRAIN
+            vsout.id = max(ivec2(0), ivec2(mc_Entity));
+        #elif defined STAGE_ENTITIES
+            vsout.id = ivec2(currentRenderedItemId == 0 ? entityId : currentRenderedItemId, 0);
+        #elif defined STAGE_BLOCK_ENTITIES
+            vsout.id = ivec2(blockEntityId, 0);
+        #endif
     }
 
 #endif

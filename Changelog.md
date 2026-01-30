@@ -1,3 +1,49 @@
+# v0.2
+
+Changes over v0.1.3:
+* Water rendering overhaul:
+  * Added water wave normals
+  * Implemented water caustics (approximated, not truly ray/path traced)
+  * Snell's Window effect
+* Added proper hardcoded/integrated specular. This means that a labPBR resource pack is no longer needed for the shaderpack to function properly! Note that hardcoded specular will override any specular maps provided by resource packs, so if you want to use a custom labPBR pack, disable Terrain > Integrated PBR > Hardcoded Specular
+  * Full support for all light sources from 1.21.11
+  * Only works well with vanilla or almost-vanilla packs
+  * Modded light sources will not work by default. To add support for a block to emit light, add the block's ID to the group `block.3 =` in block.properties.
+* Tweaked ambient (minimum) light color toward a blue-ish color
+* Increased the range of option values in path tracing settings
+* Implemented irradiance cache cascading (inspired by Kajiya renderer). This means the irradiance cache will get lower resolution with distance from the player, making it more usable in large scenes. This also allows for higher resolution near the player.
+* New camera effect: bloom
+* Added new options: 
+  * Terrain > Integrated PBR > Glowing Ores
+  * Terrain > Integrated PBR > Glowing Concrete Powder
+  * Terrain > Integrated PBR > Glowing Redstone Block
+  * Terrain > Integrated PBR > Glowing Lapis Block
+  * Terrain > Integrated PBR > Glowing Armor Trims
+  * Terrain > Integrated PBR > Mirror-Like Packed Ice
+  * Terrain > Water > Wave Height
+  * Terrain > Water > Wave Frequency
+  * Terrain > Water > Wave Speed
+  * Terrain > Water > Wave Sharpness
+  * Terrain > Water > Water Caustics
+  * Terrain > Water > Caustic Strength
+  * Path Tracing > Diffuse/Reflections/Shadows > Half Res Trace: When enabled, global illumination will be rendered at a lower resolution (half on each axis), improving performance at the cost of blurrier lighting and more noise.
+  * Diffuse Lighting > Secondary GI Intensity: This controls the intensity of secondary light bounces. Lower values will result in darker block light shadows.
+  * Reflections > Screen Space Reuse: When enabled, the reflected ray will use the screen space lighting information if it's hit point happens to be visible to the primary camera. Otherwise, the lighting information from the irradiance cache is returned.
+  * Shadows > Skip Clipping: Enabling this can greatly improve shadow quality, but will result in terrible ghosting. Should really only be used for screenshots.
+  * Denoising > Prefiltering: Applies a low-radius spatial filter before temporal accumulation for better stability and less noise. Only works when TAA is disabled.
+  * Denoising > Temporal Normal Tolerance: When enabled, the temporal filter will preserve normal detail in lighting and reflections better at the cost of noise/shimmering with detailed normal maps.
+  * Irradiance Cache > Cascade Resolution: Sets the resolution of a single cascade of the irradiance cache. If you increase this, increase Voxel Array Size as well.
+  * Irradiance Cache > Samples: The amount of rays used per entry on each irradiance cache update pass.
+  * Post Processing > Bloom
+  * Post Processing > Bloom Strength
+* Fixes:
+  * Fixed an issue with TAA that caused jittering in motion
+  * Fixed a compile error on Linux + AMD
+  * Fixed water refractions looking incorrect in some situations
+  * Fixed color banding in dark areas
+  * Fixed lines not being rendered correctly
+  * Fixed issues with grass block sides on newer Minecraft versions
+
 # v0.1.3
 
 Changes over v0.1.2:

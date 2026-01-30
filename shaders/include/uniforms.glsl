@@ -13,6 +13,7 @@
     uniform sampler2D shadowtex1;
     uniform sampler2D shadowtex0;
     
+    uniform sampler2D colortex14;
     uniform sampler2D colortex13;
     uniform sampler2D colortex12;
     uniform sampler2D colortex11;
@@ -24,6 +25,7 @@
     uniform sampler2D colortex3;
     uniform sampler2D colortex2;
     uniform sampler2D colortex0;
+    
     uniform sampler2D depthtex1;
     uniform sampler2D depthtex0;
 
@@ -62,8 +64,10 @@
     uniform vec2 renderSize;
     uniform vec2 taaOffset;
     uniform vec2 texelSize;
+    uniform vec2 pixelSize;
 
     uniform float centerDepthSmooth;
+    uniform float frameTimeCounter;
     uniform float lightBrightness;
     uniform float rainStrength;
     uniform float eyeAltitude;
@@ -78,9 +82,13 @@
     uniform ivec2 atlasSize;
 
     uniform int currentRenderedItemId;
+    uniform int blockEntityId;
+    uniform int isEyeInWater;
     uniform int frameCounter;
     uniform int renderStage;
     uniform int entityId;
+
+    uniform bool hideGUI;
 
     #define gbufferPreviousModelViewProjection mat4(gbufferPreviousModelViewProjection0, gbufferPreviousModelViewProjection1, gbufferPreviousModelViewProjection2, gbufferPreviousModelViewProjection3)
     #define gbufferModelViewProjectionInverse mat4(gbufferModelViewProjectionInverse0, gbufferModelViewProjectionInverse1, gbufferModelViewProjectionInverse2, gbufferModelViewProjectionInverse3)

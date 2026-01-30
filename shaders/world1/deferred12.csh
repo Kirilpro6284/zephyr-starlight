@@ -1,3 +1,6 @@
 #version 430 compatibility
 
-#include "/program/deferred/pathtracing/tracing/shadowTracing.glsl"
+#define SWAP_TO colorimg12
+#define READ_FROM colortex2
+
+#include "/program/swapBuffers.glsl"

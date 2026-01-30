@@ -4,6 +4,7 @@
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
+#include "/include/wave.glsl"
 #include "/include/raytracing.glsl"
 #include "/include/textureData.glsl"
 

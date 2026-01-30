@@ -49,7 +49,7 @@
     }
 
     #ifndef STAGE_SETUP
-        vec3 getLightTransmittance (vec3 pos, vec3 lightDir) {
+        vec3 lightTransmittance (vec3 pos, vec3 lightDir) {
             float sqrLength = dot(pos, pos);
             float invLength = inversesqrt(sqrLength);
 
@@ -58,8 +58,8 @@
             return floor(uv) == vec2(0.0) ? sqr(texture(texTransmittance, uv).rgb) : vec3(0.0);
         }
 
-        vec3 getLightTransmittance (vec3 lightDir) {
-            return getLightTransmittance(vec3(0.0, planetRadius + eyeAltitude + ALTITUDE_BIAS, 0.0), lightDir);
+        vec3 lightTransmittance (vec3 lightDir) {
+            return lightTransmittance(vec3(0.0, planetRadius + eyeAltitude + ALTITUDE_BIAS, 0.0), lightDir);
         }
 
         float phaseRayleigh (float cosTheta)
@@ -95,7 +95,7 @@
 
                 if (raySphere(Ray(rayPos, lightDir), planetRadius).x == INFINITY) {
                     radiance += exp(-rayDest * (absorption * opticalDepth)) 
-                              * getLightTransmittance(rayPos, lightDir)
+                              * lightTransmittance(rayPos, lightDir)
                               * (scattering * (phase * density.xy));
                 }
             }

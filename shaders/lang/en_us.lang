@@ -3,14 +3,14 @@ profile.FAST  = §cFast
 
 option.MAIN_TITLE = Zephyr Starlight
 
-value.MAIN_TITLE.0 = §dv0.1.3
-value.MAIN_TITLE.1 = §cv0.1.3
-value.MAIN_TITLE.2 = §6v0.1.3
-value.MAIN_TITLE.3 = §ev0.1.3
-value.MAIN_TITLE.4 = §av0.1.3
-value.MAIN_TITLE.5 = §bv0.1.3
-value.MAIN_TITLE.6 = §9v0.1.3
-value.MAIN_TITLE.7 = §5v0.1.3
+value.MAIN_TITLE.0 = §dv0.2
+value.MAIN_TITLE.1 = §cv0.2
+value.MAIN_TITLE.2 = §6v0.2
+value.MAIN_TITLE.3 = §ev0.2
+value.MAIN_TITLE.4 = §av0.2
+value.MAIN_TITLE.5 = §bv0.2
+value.MAIN_TITLE.6 = §9v0.2
+value.MAIN_TITLE.7 = §5v0.2
 
 screen.PATH_TRACING    = Path Tracing
 screen.ATMOSPHERICS    = Atmosphere & Lighting
@@ -42,6 +42,7 @@ option.MINIMUM_LIGHT                 = Minimum Light
 option.SAMPLING_METHOD               = Sampling Method
 value.SAMPLING_METHOD.0              = Uniform
 value.SAMPLING_METHOD.1              = Cosine Weighted
+option.SECONDARY_GI_BRIGHTNESS       = Secondary GI Intensity
 
 option.REFLECTION_SAMPLES               = Reflection Samples
 option.REFLECTION_MAX_RT_DISTANCE       = Reflection Trace Distance
@@ -49,20 +50,33 @@ option.PT_REFLECTION_ACCUMULATION_LIMIT = Max Accumulated Frames
 option.REFLECTION_ROUGHNESS_THRESHOLD   = Reflection Roughness Threshold
 option.REFLECTION_BOUNCES               = Reflection Bounces
 option.REFLECTION_PER_PIXEL_SHADOWS     = Per Pixel Shadow Calculation
+option.REFLECTION_SS_REUSE              = Screen Space Reuse
 
 option.SHADOW_SAMPLES               = Shadow Samples
 option.SHADOW_MAX_RT_DISTANCE       = Shadow Trace Distance
 option.PT_SHADOW_ACCUMULATION_LIMIT = Max Accumulated Frames
 option.SHADOW_SOFTNESS              = Shadow Softness
+option.SHADOW_SKIP_CLIPPING         = Skip Clipping
+
+option.DIFFUSE_HALF_RES    = Half Res Trace
+option.REFLECTION_HALF_RES = Half Res Trace
+option.SHADOW_HALF_RES     = Half Res Trace
 
 option.DENOISER_DEPTH_WEIGHT  = Denoiser Depth Weight
 option.DENOISER_NORMAL_WEIGHT = Denoiser Normal Weight
 option.DENOISER_SHARPENING    = Denoiser Sharpness
 
+option.TEMPORAL_PREFILTERING      = Prefiltering
+option.TEMPORAL_NORMAL_TOLERANCE  = Temporal Normal Tolerance
+
 option.IRCACHE_VOXEL_ARRAY_SIZE = Voxel Array Size
 option.IRCACHE_PROBE_ATTEMPTS   = Probe Attempts
 option.IRCACHE_UPDATE_INTERVAL  = Update Interval
 option.IRCACHE_MAX_RT_DISTANCE  = Trace Distance
+option.IRCACHE_CASCADE_RES      = Cascade Resolution
+option.IRCACHE_SAMPLES          = Samples
+
+suffix.IRCACHE_CASCADE_RES      = ³
 
 option.VOXELIZATION_DISTANCE   = Voxelization Distance
 option.entityShadowDistanceMul = Entity Voxelization Distance Multiplier
@@ -100,16 +114,35 @@ option.GLASS_REFRACTION       = Glass Refraction
 option.WATER_REFRACTION       = Water Refraction
 option.REFRACTION_BOUNCES     = Refraction Bounces
 option.GLASS_IOR              = Index of Refraction
-option.EMISSION_BRIGHTNESS    = Emission Brightness
 option.GLASS_REFLECTANCE      = Glass Reflectance
 option.GLASS_OPACITY          = Glass Opacity
 option.WATER_ABSORPTION_R     = Water Absorption (R)
 option.WATER_ABSORPTION_G     = Water Absorption (G)
 option.WATER_ABSORPTION_B     = Water Absorption (B)
 option.WATER_REFLECTANCE      = Water Reflectance 
-option.IPBR                   = Hardcoded Emission
 
-option.TAA = TAA
+screen.TERRAIN_IPBR            = Integrated PBR
+
+option.IPBR                    = Hardcoded Specular
+option.EMISSION_BRIGHTNESS     = Emission Brightness
+option.GLOWING_ORES            = Glowing Ores
+option.GLOWING_CONCRETE_POWDER = Glowing Concrete Powder
+option.GLOWING_REDSTONE_BLOCK  = Glowing Redstone Block
+option.GLOWING_LAPIS_BLOCK     = Glowing Lapis Block
+option.GLOWING_ARMOR_TRIMS     = Glowing Armor Trims
+option.MIRROR_PACKED_ICE       = Mirror-Like Packed Ice
+
+screen.TERRAIN_WATER           = Water
+
+option.WATER_WAVE_HEIGHT       = Wave Height
+option.WATER_WAVE_FREQUENCY    = Wave Frequency
+option.WATER_WAVE_SPEED        = Wave Speed
+option.WATER_WAVE_SHARPNESS    = Wave Sharpness
+
+option.WATER_CAUSTICS          = Water Caustics
+option.WATER_CAUSTICS_STRENGTH = Caustic Strength
+
+option.TAA = Enable TAA
 option.TAA_UPSCALING_FACTOR = TAAU Render Scale
 suffix.TAA_UPSCALING_FACTOR = %
 
@@ -117,7 +150,7 @@ option.TAA_JITTER_SCALE       = TAA Jitter Scale
 option.TAA_ACCUMULATION_LIMIT = Max Frames
 option.TAA_VARIANCE_WEIGHT    = TAA Variance Weight
 option.TAA_OFFCENTER_WEIGHT   = TAA Offcenter Weight
-option.TAA_MIP_BIAS           = TAA Mip Bias
+option.TAA_MIP_SCALE          = TAA Mip Bias
 option.SHARPENING             = Sharpening
 
 option.DYNAMIC_EXPOSURE             = Dynamic Exposure
@@ -137,12 +170,19 @@ option.DOF_SAMPLES                  = DoF Samples
 option.DOF_FOCUS_MODE               = DoF Focus Mode
 option.DOF_FOCUS_DISTANCE           = Focus Distance
 
+option.BLOOM                        = Bloom
+option.BLOOM_STRENGTH               = Bloom Strength
+
 value.DOF_FOCUS_MODE.0              = Auto
 value.DOF_FOCUS_MODE.1              = Manual
 
 option.HAND_FOV               = Hand FOV
 option.DISABLE_DENOISING      = Disable Denoising
 option.FORCE_TRIANGLE_TRACING = Force Triangle Tracing
-option.TAA_VIRTUAL_DEPTH  = TAA Virtual Depth Buffer
+option.TAA_VIRTUAL_DEPTH      = TAA Virtual Depth Buffer
 
+value.HAND_FOV.0              = Default
 suffix.HAND_FOV               = °
+
+option.DEBUG_IRCACHE = View Irradiance Cache
+option.DEBUG_VOXELIZATION = View Voxelization

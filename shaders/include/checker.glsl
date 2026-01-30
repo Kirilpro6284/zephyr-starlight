@@ -1,30 +1,19 @@
 #ifndef INCLUDE_CHECKER
     #define INCLUDE_CHECKER
 
-    const ivec2[4] checkerOffsets2x2 = ivec2[4](
-        ivec2(0, 1),
-        ivec2(1, 0),
-        ivec2(1, 1),
-        ivec2(0, 0)
-    );
+    ivec2 checker2x2 (int i) 
+    {
+        return ivec2(i, (i + 1) >> 1) & ivec2(1);
+    }
 
-    const ivec2[16] checkerOffsets4x4 = ivec2[16](
-        ivec2(0, 3),
-        ivec2(2, 1),
-        ivec2(2, 3),
-        ivec2(0, 1),
-        ivec2(1, 2),
-        ivec2(3, 0),
-        ivec2(3, 2),
-        ivec2(1, 0),
-        ivec2(1, 3),
-        ivec2(3, 1),
-        ivec2(3, 3),
-        ivec2(1, 1),
-        ivec2(0, 2),
-        ivec2(2, 0),
-        ivec2(2, 2),
-        ivec2(0, 0)
-    );
+    ivec2 checker4x4 (int i) 
+    {
+        return checker2x2(i) * 2 + checker2x2(i >> 2);
+    }
+
+    ivec2 checker8x8 (int i) 
+    {
+        return checker4x4(i) * 2 + checker2x2(i >> 4);
+    }
 
 #endif

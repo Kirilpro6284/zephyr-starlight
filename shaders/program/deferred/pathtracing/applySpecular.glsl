@@ -4,12 +4,18 @@
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
-#include "/include/textureSampling.glsl"
 #include "/include/atmosphere.glsl"
 #include "/include/brdf.glsl"
 #include "/include/spaceConversion.glsl"
-
 #include "/include/text.glsl"
+
+#ifdef REFLECTION_HALF_RES
+    #define INDIRECT_LIGHTING_RES 2
+#else
+    #define INDIRECT_LIGHTING_RES 1
+#endif
+
+#include "/include/textureSampling.glsl"
 
 /* RENDERTARGETS: 7 */
 layout (location = 0) out vec4 color;
@@ -24,10 +30,12 @@ void main ()
     if (depth == 1.0) return;
 
     DeferredMaterial mat = unpackMaterialData(texel);
-    color.rgb += EMISSION_BRIGHTNESS * mat.albedo.rgb * mat.emission;
+    color.rgb += EXPONENT_BIAS * EMISSION_BRIGHTNESS * mat.albedo.rgb * mat.emission;
 
     if (mat.roughness > REFLECTION_ROUGHNESS_THRESHOLD) return;
 
-    color.rgb += texelFetch(colortex2, texel, 0).rgb * schlickFresnel(mat.F0, dot(mat.textureNormal, normalize(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, 0.0)).xyz - screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, depth)).xyz)));
-    color.rgb = dither11f(gl_FragCoord.xy, color.rgb);
+    vec3 currPos = screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, depth)).xyz;
+    vec3 reflectedIrradiance = upsampleRadiance(currPos, mat.geoNormal, mat.textureNormal);
+
+    color.rgb += EXPONENT_BIAS * reflectedIrradiance * schlickFresnel(mat.F0, dot(mat.textureNormal, normalize(screenToPlayerPos(vec3(gl_FragCoord.xy * texelSize, 0.0)).xyz - currPos)));
 }

@@ -7,6 +7,7 @@
 #include "/include/main.glsl"
 #include "/include/heitz.glsl"
 #include "/include/octree.glsl"
+#include "/include/wave.glsl"
 #include "/include/raytracing.glsl"
 #include "/include/textureData.glsl"
 #include "/include/brdf.glsl"
@@ -17,19 +18,32 @@
 layout (rgba16f) uniform image2D colorimg2;
 layout (local_size_x = 8, local_size_y = 8) in;
 
-#if TAA_UPSCALING_FACTOR == 100
-    const vec2 workGroupsRender = vec2(0.5, 0.5);
-#elif TAA_UPSCALING_FACTOR == 75
-    const vec2 workGroupsRender = vec2(0.375, 0.375);
-#elif TAA_UPSCALING_FACTOR == 50
-    const vec2 workGroupsRender = vec2(0.25, 0.25);
+#ifdef DIFFUSE_HALF_RES
+    #if TAA_UPSCALING_FACTOR == 100
+        const vec2 workGroupsRender = vec2(0.5, 0.5);
+    #elif TAA_UPSCALING_FACTOR == 75
+        const vec2 workGroupsRender = vec2(0.375, 0.375);
+    #elif TAA_UPSCALING_FACTOR == 50
+        const vec2 workGroupsRender = vec2(0.25, 0.25);
+    #endif
+#else
+    #if TAA_UPSCALING_FACTOR == 100
+        const vec2 workGroupsRender = vec2(1.0, 1.0);
+    #elif TAA_UPSCALING_FACTOR == 75
+        const vec2 workGroupsRender = vec2(0.75, 0.75);
+    #elif TAA_UPSCALING_FACTOR == 50
+        const vec2 workGroupsRender = vec2(0.5, 0.5);
+    #endif
 #endif
 
 void main ()
 {
     uint state = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * uint(renderSize.x / 2.0) + uint(renderSize.x / 2.0) * uint(renderSize.y / 2.0) * (frameCounter & 1023u);
-    ivec2 offset = checkerOffsets2x2[frameCounter & 3];
-    ivec2 offsetCoord = ivec2(gl_GlobalInvocationID.xy) * 2 + ivec2(offset);
+    #ifdef DIFFUSE_HALF_RES
+        ivec2 offsetCoord = ivec2(gl_GlobalInvocationID.xy) * 2 + checker2x2(frameCounter);
+    #else
+        ivec2 offsetCoord = ivec2(gl_GlobalInvocationID.xy);
+    #endif
 
     float depth = texelFetch(depthtex1, offsetCoord, 0).x;
 
@@ -78,21 +92,25 @@ void main ()
             float pdf = max(0.0, dot(mat.textureNormal, diffuseRay.direction));
         #endif
 
-        RayHitInfo rt = TraceRay(diffuseRay, DIFFUSE_MAX_RT_DISTANCE, true, true);
+        RayHitInfo rt = TraceGenericRay(diffuseRay, DIFFUSE_MAX_RT_DISTANCE, true, true);
 
-        if (rt.dist != DIFFUSE_MAX_RT_DISTANCE) {        
-            IRCResult query = irradianceCache(diffuseRay.origin + diffuseRay.direction * rt.dist, rt.normal, 0u);
-            radiance += pdf * (rt.albedo.rgb * rt.emission + smoothstep(0.0, 0.75, rt.dist) * max(vec3(MINIMUM_LIGHT), query.diffuseIrradiance * rt.albedo.rgb));
+        if (rt.dist != DIFFUSE_MAX_RT_DISTANCE) {       
+            vec3 hitPos = diffuseRay.origin + diffuseRay.direction * rt.dist;
+			float distGradient = exp2(-floor(clamp(log2(length(hitPos)) - log2(IRCACHE_CASCADE_RES / 8.0), -1.0, 0.0))) * rt.dist * dot(mat.geoNormal, diffuseRay.direction);
+
+            IrradianceSum query = irradianceCache(0.999 * hitPos, rt.normal, 0u);
+
+            radiance += pdf * (rt.albedo.rgb * rt.emission + smoothstep(0.0, 0.5, distGradient) * max(MINIMUM_LIGHT * vec3(0.4, 0.5, 1.0), query.diffuseIrradiance * rt.albedo.rgb));
 
             vec3 dir = sampleSunDir(shadowDir, vec2(randomValue(state), randomValue(state)));
 
             if (dot(rt.normal, dir) > -0.0001) {
-                vec3 sunlight = getLightTransmittance(shadowDir) * pdf * lightBrightness * evalCookBRDF(normalize(shadowDir + rt.normal * 0.03125), diffuseRay.direction, max(0.1, rt.roughness), rt.normal, rt.albedo.rgb, rt.F0);
+                vec3 sunlight = lightTransmittance(shadowDir) * pdf * lightBrightness * evalCookBRDF(normalize(shadowDir + rt.normal * 0.03125), diffuseRay.direction, max(0.2, rt.roughness), rt.normal, rt.albedo.rgb, rt.F0);
 
                 #if SUNLIGHT_GI_QUALITY == 0
-                    sunlight *= max(smoothstep(0.0, 0.75, rt.dist), step(0.95, luminance(query.directIrradiance))) * query.directIrradiance;
+                    sunlight *= smoothstep(0.0, 0.75, distGradient) * query.directIrradiance;
                 #elif SUNLIGHT_GI_QUALITY == 1
-                    if (randomValue(state) > smoothstep(0.75, 1.0, rt.dist) && (clamp(query.directIrradiance, vec3(0.01), vec3(0.99)) == query.directIrradiance)) {
+                    if (randomValue(state) > smoothstep(0.5, 1.0, distGradient) && (clamp(query.directIrradiance, vec3(0.01), vec3(0.99)) == query.directIrradiance)) {
                         sunlight *= TraceShadowRay(Ray(diffuseRay.origin + diffuseRay.direction * rt.dist + rt.normal * 0.003, dir), 1024.0, true).rgb;
                     } else {
                         sunlight *= query.directIrradiance;
@@ -117,5 +135,5 @@ void main ()
 
     radiance *= rcp(DIFFUSE_SAMPLES);
 
-    imageStore(colorimg2, ivec2(gl_GlobalInvocationID.xy), vec4(4.0 * radiance, 1.0));
+    imageStore(colorimg2, ivec2(gl_GlobalInvocationID.xy), vec4(radiance, 1.0));
 }

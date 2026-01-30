@@ -27,7 +27,7 @@ void main ()
     if (renderStage == MC_RENDER_STAGE_MOON) albedo.rgb = vec3(luminance(albedo.rgb));
 
     albedo *= vec4(vsout.vertexColor, 1.0);
-    albedo.rgb *= (renderStage == MC_RENDER_STAGE_MOON ? getLightTransmittance(normalize(vsout.vertexPosition)) : vec3(3.0));
+    albedo.rgb *= (renderStage == MC_RENDER_STAGE_MOON ? lightTransmittance(normalize(vsout.vertexPosition)) : vec3(3.0));
 
     if (albedo.a < 0.1) discard;
 }

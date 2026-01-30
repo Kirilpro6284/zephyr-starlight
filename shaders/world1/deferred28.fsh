@@ -1,5 +1,5 @@
 #version 430 compatibility
 
-#define FILTER_PASS 7
+#define FILTER_PASS 4
 
 #include "/program/deferred/pathtracing/denoising/reflectionSpatial.glsl"

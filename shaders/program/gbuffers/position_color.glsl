@@ -49,7 +49,7 @@ void main ()
 
     vsout.vertexColor = gl_Color;
 
-    if (renderStage == MC_RENDER_STAGE_STARS) vsout.vertexColor.rgb *= getLightTransmittance(normalize(vertexPosition));
+    if (renderStage == MC_RENDER_STAGE_STARS) vsout.vertexColor.rgb *= lightTransmittance(normalize(vertexPosition));
 }
 
 #endif

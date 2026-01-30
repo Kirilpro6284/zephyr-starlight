@@ -6,6 +6,7 @@
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
 #include "/include/octree.glsl"
+#include "/include/wave.glsl"
 #include "/include/raytracing.glsl"
 #include "/include/textureData.glsl"
 #include "/include/brdf.glsl"

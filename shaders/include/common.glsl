@@ -246,7 +246,7 @@
 
     vec3 dither11f (vec2 coord, vec3 color)
     {
-        return color + (blueNoise(coord) - 0.5) * uintBitsToFloat(floatBitsToUint(max(vec3(0.000061035156), color)) & uvec3(0xff800000u)) / vec3(64.0, 64.0, 32.0);
+        return color + (blueNoise(coord) - 0.5) * uintBitsToFloat(floatBitsToUint(max(vec3(0.000061035156), color)) & uvec3(0xff800000u)) * vec3(0.015625, 0.015625, 0.03125);
     }
 
     // Adapted from https://www.youtube.com/watch?v=Qz0KTGYJtUk&t=674s

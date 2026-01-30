@@ -4,8 +4,6 @@
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
-#include "/include/textureSampling.glsl"
-#include "/include/text.glsl"
 #include "/include/spaceConversion.glsl"
 
 /* RENDERTARGETS: 10 */
@@ -33,9 +31,9 @@ void main ()
     }
 
     vec4 playerPos = screenToPlayerPos(vec3(uv, depth));
-    vec4 focusPos  = screenToPlayerPos(vec3(uv, centerDepthSmooth));
-
+    
     #if DOF_FOCUS_MODE == 0
+        vec4 focusPos  = screenToPlayerPos(vec3(uv, centerDepthSmooth));
         float radius = APERTURE_SIZE * abs(playerPos.w - focusPos.w) * gbufferProjection[0].x;
     #else
         float radius = APERTURE_SIZE * abs(playerPos.w - rcp(DOF_FOCUS_DISTANCE)) * gbufferProjection[0].x;

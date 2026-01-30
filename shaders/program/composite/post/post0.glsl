@@ -4,8 +4,6 @@
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
-#include "/include/textureSampling.glsl"
-#include "/include/text.glsl"
 #include "/include/spaceConversion.glsl"
 
 /* RENDERTARGETS: 10 */
@@ -28,16 +26,21 @@ void main ()
     #endif
 
     vec3 playerPos = screenToPlayerPos(vec3(uv, depth)).xyz;
-    vec2 prevTexel = screenSize * (projectAndDivide(gbufferPreviousModelViewProjection, (depth == 1.0 || depth < 0.7) ? playerPos : (playerPos + cameraVelocity)).xy * 0.5 + 0.5);
+    vec4 prevUv = projectAndDivide(gbufferPreviousModelViewProjection, (depth == 1.0 || depth < 0.7) ? playerPos : (playerPos + cameraVelocity));
+    vec2 prevTexel = screenSize * (prevUv.xy * 0.5 + 0.5);
 
-    vec3 integratedData = vec3(0.0);
-    vec2 sampleDir = clipAABB(gl_FragCoord.xy, prevTexel - gl_FragCoord.xy, vec2(0.0), vec2(screenSize)) * rcp(MOTION_BLUR_SAMPLES) * MOTION_BLUR_STRENGTH;
-    vec2 samplePos = gl_FragCoord.xy + sampleDir * blueNoise(gl_FragCoord.xy).r;
+    if (prevUv.w > 0.0) {
+        vec3 integratedData = vec3(0.0);
+        vec2 sampleDir = clipAABB(gl_FragCoord.xy, prevTexel - gl_FragCoord.xy, vec2(0.0), vec2(screenSize)) * rcp(MOTION_BLUR_SAMPLES) * MOTION_BLUR_STRENGTH;
+        vec2 samplePos = gl_FragCoord.xy + sampleDir * blueNoise(gl_FragCoord.xy).r;
 
-    for (int i = 0; i < MOTION_BLUR_SAMPLES; i++, samplePos += sampleDir)
-    {
-        integratedData += texelFetch(colortex10, ivec2(samplePos), 0).rgb;
+        for (int i = 0; i < MOTION_BLUR_SAMPLES; i++, samplePos += sampleDir)
+        {
+            integratedData += texelFetch(colortex10, ivec2(samplePos), 0).rgb;
+        }
+
+        color = vec4(integratedData * rcp(MOTION_BLUR_SAMPLES), 1.0);
+    } else {
+        color = texelFetch(colortex10, ivec2(gl_FragCoord.xy), 0);
     }
-
-    color = vec4(integratedData * rcp(MOTION_BLUR_SAMPLES), 1.0);
 }

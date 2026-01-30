@@ -47,7 +47,7 @@
         uint data;
     };
 
-    struct IRCVoxel
+    struct IrcacheVoxel
     {
         uint packedPos;
         uint lastFrame;
@@ -58,7 +58,7 @@
         uvec2 radiance;
     };
 
-    struct IRCResult
+    struct IrradianceSum
     {
         vec3 diffuseIrradiance;
         vec3 directIrradiance;
@@ -108,7 +108,7 @@
 
     layout (std430, binding = 2) buffer irradiance_cache
     {
-        IRCVoxel entries[];
+        IrcacheVoxel entries[];
     } ircache;
 
     layout (std430, binding = 3) buffer voxel_buffer
@@ -118,13 +118,14 @@
 
     layout (std430, binding = 4) readonly buffer heitz_layout 
     {
-        int sobol256spp[65536];
-        int scramblingTile[131072];
-        int rankingTile[131072];
+        int data[];
     } heitzLayout;
+
+    const uint heitzOffsets[3] = uint[3](0u, 65536u, 196608u);
 
     layout (std430, binding = 5) buffer render_state
     {
+        mat4 gbufferPreviousModelViewProjectionInverse;
         float globalLuminance;
     } renderState;
 
@@ -140,8 +141,10 @@
 
     #ifdef STAGE_BEGIN
         layout (r11f_g11f_b10f) uniform image2D imgSkyView;
+        layout (rg16f) uniform image2D imgCaustic;
     #else
         uniform sampler2D texSkyView;
+        uniform sampler2D texCaustic;
     #endif
 
     uint addVoxel (ivec3 voxel, uint data)
@@ -189,9 +192,13 @@
         uvec3 data = uvec3(texelFetch(colortex8, texel, 0).rg, texelFetch(colortex9, texel, 0).r);
 
         vec4 albedo = unpackUnorm4x8(data.x);
-        vec4 specularData = unpack4x6(data.y);
-        vec4 normalData = unpackExp4x8(data.z);
-
+        vec4 specularData = unpackUnorm4x8(data.y).gbra;
+        #ifdef NORMAL_MAPPING
+            vec4 normalData = unpackExp4x8(data.z);
+        #else
+            vec4 normalData = unpackExp4x8(data.z).zwzw;
+        #endif
+        
         DeferredMaterial result;
 
         result.F0 = vec3(0.0);
@@ -215,8 +222,13 @@
         uvec4 pack;
 
         pack.x = packUnorm4x8(vec4(albedo, 0.0)) | ((blockId & 255u) << 24u);
-        pack.y = pack4x6(specularData) | ((blockId >> 8u) & 127u) | (uint(isHand) << 7u);
-        pack.z = packExp4x8(vec4(octEncode(geoNormal), octEncode(textureNormal)));
+        pack.y = packUnorm4x8(vec4(0.0, specularData.rga)) | ((blockId >> 8u) & 127u) | (uint(isHand) << 7u);
+        #ifdef NORMAL_MAPPING
+            pack.z = packExp4x8(vec4(octEncode(geoNormal), octEncode(textureNormal)));
+        #else
+            pack.z = packExp4x8(vec4(0.0, 0.0, octEncode(geoNormal).xy));
+        #endif
+        pack.w = 0u;
 
         return pack;
     }

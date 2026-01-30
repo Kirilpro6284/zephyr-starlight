@@ -1,6 +1,6 @@
 #version 430 compatibility
 
 #define vsh
-#define VOXELIZATION
+#define STAGE_BLOCK_ENTITIES
 
 #include "/program/gbuffers/solid.glsl"

@@ -3,22 +3,27 @@
 
     float heitzSample (ivec2 pixel, int sampleIndex, int sampleDimension)
     {
+    
         // wrap arguments
         pixel = pixel & 127;
         sampleIndex = sampleIndex & 255;
         sampleDimension = sampleDimension & 255;
 
         // xor index based on optimized ranking
-        int rankedSampleIndex = sampleIndex ^ heitzLayout.rankingTile[sampleDimension + (pixel.x + pixel.y * 128) * 8];
+        int rankedSampleIndex = sampleIndex ^ heitzLayout.data[heitzOffsets[2] + sampleDimension + (pixel.x + pixel.y * 128) * 8];
 
         // fetch value in sequence
-        int value = heitzLayout.sobol256spp[sampleDimension + rankedSampleIndex * 256];
+        int value = heitzLayout.data[heitzOffsets[0] + sampleDimension + rankedSampleIndex * 256];
 
         // If the dimension is optimized, xor sequence value based on optimized scrambling
-        value = value ^ heitzLayout.scramblingTile[(sampleDimension % 8) + (pixel.x + pixel.y * 128) * 8];
+        value = value ^ heitzLayout.data[heitzOffsets[1] + (sampleDimension % 8) + (pixel.x + pixel.y * 128) * 8];
 
         // convert to float and return
         return (value + R1(frameCounter)) / 256.0;
+        
+       // uint state = pixel.x + pixel.y * 8192 + 16777216 * sampleIndex + 268435456 * sampleDimension;
+       // return randomValue(state);
+
     }
 
     vec3 randomDirBlueNoise (ivec2 pixel, int i)

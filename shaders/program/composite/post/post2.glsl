@@ -4,8 +4,6 @@
 #include "/include/common.glsl"
 #include "/include/pbr.glsl"
 #include "/include/main.glsl"
-#include "/include/textureSampling.glsl"
-#include "/include/text.glsl"
 
 /* RENDERTARGETS: 10 */
 layout (location = 0) out vec4 color;
